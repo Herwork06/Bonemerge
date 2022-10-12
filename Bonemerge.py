@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Bonemerge",
-    "author": "Herwork",
-    "version": (1, 0),
+    "author": "Herwork, hisanimations",
+    "version": (1, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Rigging",
     "description": "Snaps any cosmetics to a player rig",
@@ -18,29 +18,36 @@ from bpy_extras.object_utils import AddObjectHelper, object_data_add
 from mathutils import Vector
 
 
+loc = "BONEMERGE-ATTACH-LOC"
+rot = "BONEMERGE-ATTACH-ROT"
 
-
-def main(context, targ, mode):        
-    if mode == 0: 
-        for i in bpy.context.object.pose.bones:
-            try:
-                bpy.data.objects[targ].pose.bones[i.name]
-            except:
+def main(context, targ, mode):
+    targ = targ.name
+    if mode == 0:
+        for i in bpy.context.selected_objects:
+            if i.name == targ:
                 continue
-            i.constraints.new('COPY_LOCATION')
-            i.constraints.new('COPY_ROTATION')
-            i.constraints['Copy Location'].target = bpy.data.objects[targ]
-            i.constraints['Copy Location'].subtarget = i.name
-            i.constraints['Copy Rotation'].target = bpy.data.objects[targ]
-            i.constraints['Copy Rotation'].subtarget = i.name
+            if i.type == 'MESH':
+                i = i.parent
+            for ii in i.pose.bones:
+                try:
+                    bpy.data.objects[targ].pose.bones[ii.name]
+                except:
+                    continue
+                i.constraints.new('COPY_LOCATION').name = loc
+                i.constraints.new('COPY_ROTATION').name = rot
+                i.constraints[loc].target = bpy.data.objects[targ]
+                i.constraints[loc].subtarget = i.name
+                i.constraints[rot].target = bpy.data.objects[targ]
+                i.constraints[rot].subtarget = i.name
 
-    if mode == 1:
-        for i in bpy.context.object.pose.bones:
-            try:
-                i.constraints.remove(i.constraints["Copy Location"])
-                i.constraints.remove(i.constraints["Copy Rotation"])
-            except:
-                continue
+        if mode == 1:
+            for i in bpy.context.object.pose.bones:
+                try:
+                    i.constraints.remove(i.constraints[loc])
+                    i.constraints.remove(i.constraints[rot])
+                except:
+                    continue
 
 
 
