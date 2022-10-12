@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "Snapify",
+    "name": "Bonemerge",
     "author": "Herwork",
     "version": (1, 0),
     "blender": (2, 80, 0),
@@ -47,7 +47,7 @@ def main(context, targ, mode):
 class addArm(bpy.types.Operator):
     """A button that does stuff.."""
     bl_idname = "rig.snap"
-    bl_label = "Snap!"
+    bl_label = "Attach"
     
     def execute(self, context):
         scene = context.scene
@@ -66,7 +66,7 @@ class addArm(bpy.types.Operator):
 class removeArm(bpy.types.Operator):
     """A button that does stuff.."""
     bl_idname = "rig.remove"
-    bl_label = "Unsnap"
+    bl_label = "Detach"
     
     def execute(self, context):
         scene = context.scene
@@ -83,11 +83,11 @@ class removeArm(bpy.types.Operator):
 
 
 class TestPanel(bpy.types.Panel):
-    bl_label = "Snapify"
-    bl_idname = "PT_SnapPanel"
+    bl_label = "Bonemerge"
+    bl_idname = "PT_MergePanel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Snapify"
+    bl_category = "Bonemerge"
     
     def draw(self, context):
         scene = context.scene
