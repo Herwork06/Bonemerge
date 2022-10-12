@@ -25,6 +25,8 @@ def main(context, mode, targ = None):
     #targ = targ.name
     if mode == 0:
         for i in bpy.context.selected_objects:
+            if not (i.type == 'MESH' or i.type == 'ARMATURE'):
+                continue
             if i.name == targ:
                 continue
             if i.type == 'MESH':
@@ -55,6 +57,8 @@ def main(context, mode, targ = None):
 
     if mode == 1:
         for i in bpy.context.selected_objects:
+            if not (i.type == 'MESH' or i.type == 'ARMATURE'):
+                continue
             if i.type == 'MESH':
                 if not i.parent:
                     continue
@@ -125,6 +129,7 @@ class TestPanel(bpy.types.Panel):
         row.label(text= "Snap cosmetic to a rig", icon= "COMMUNITY")
         row = layout.row(align=True)
         row.operator("rig.snap", icon="LINKED")
+        row = layout.row()
         row.operator("rig.remove", icon="UNLINKED")
 
 
