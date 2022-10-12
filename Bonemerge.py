@@ -21,72 +21,88 @@ from mathutils import Vector
 loc = "BONEMERGE-ATTACH-LOC"
 rot = "BONEMERGE-ATTACH-ROT"
 
-def main(context, targ, mode):
-    targ = targ.name
+def main(context, mode, targ = None):
+    #targ = targ.name
     if mode == 0:
         for i in bpy.context.selected_objects:
             if i.name == targ:
                 continue
             if i.type == 'MESH':
-                i = i.parent
+                if not i.parent:
+                    continue
+                else:
+                    i = i.parent
+            
+            #i.location = bpy.data.objects[targ].location # for organization
+            
             for ii in i.pose.bones:
                 try:
                     bpy.data.objects[targ].pose.bones[ii.name]
                 except:
                     continue
-                i.constraints.new('COPY_LOCATION').name = loc
-                i.constraints.new('COPY_ROTATION').name = rot
-                i.constraints[loc].target = bpy.data.objects[targ]
-                i.constraints[loc].subtarget = i.name
-                i.constraints[rot].target = bpy.data.objects[targ]
-                i.constraints[rot].subtarget = i.name
-
-        if mode == 1:
-            for i in bpy.context.object.pose.bones:
+                    
                 try:
-                    i.constraints.remove(i.constraints[loc])
-                    i.constraints.remove(i.constraints[rot])
+                    ii.constraints[loc]
+                    pass
+                except:
+                    ii.constraints.new('COPY_LOCATION').name = loc
+                    ii.constraints.new('COPY_ROTATION').name = rot
+                
+                ii.constraints[loc].target = bpy.data.objects[targ]
+                ii.constraints[loc].subtarget = ii.name
+                ii.constraints[rot].target = bpy.data.objects[targ]
+                ii.constraints[rot].subtarget = ii.name
+
+    if mode == 1:
+        for i in bpy.context.selected_objects:
+            if i.type == 'MESH':
+                if not i.parent:
+                    continue
+                else:
+                    i = i.parent
+            for ii in i.pose.bones:
+                try:
+                    ii.constraints.remove(ii.constraints[loc])
+                    ii.constraints.remove(ii.constraints[rot])
                 except:
                     continue
 
 
 
 class addArm(bpy.types.Operator):
-    """A button that does stuff.."""
+    """Attach cosmetics"""
     bl_idname = "rig.snap"
     bl_label = "Attach"
+    bl_options = {'UNDO'} # make undoable
     
     def execute(self, context):
         scene = context.scene
         targ = scene.mychosenObject
-        print(targ)
         if targ == None:
             self.report({"ERROR"}, "No player rig found")
         
         try:
-            main(context, targ.name, 0)
+            main(context, 0, targ.name)
             return {'FINISHED'}
         except:
             self.report({"ERROR"}, "Object or Armature found")
 
 
 class removeArm(bpy.types.Operator):
-    """A button that does stuff.."""
+    """Detach cosmetics"""
     bl_idname = "rig.remove"
     bl_label = "Detach"
+    bl_options = {'UNDO'}
     
     def execute(self, context):
         scene = context.scene
-        targ = scene.mychosenObject
-        print(targ)
-        if targ == None:
-            self.report({"ERROR"}, "No player rig found")
+        targ = "justcause"
         
         try:
-            main(context, targ.name, 1)
+            main(context, 1) #a target is not needed
             return {'FINISHED'}
         except:
-            self.report({"ERROR"}, "Object or Armature found")
+            raise TypeError("you have somehow made an error!")
 
 
 class TestPanel(bpy.types.Panel):
@@ -99,7 +115,7 @@ class TestPanel(bpy.types.Panel):
     def draw(self, context):
         scene = context.scene
         layout = self.layout
-        mytool = scene.my_tool
+        #mytool = scene.my_tool - this crashes the addon
         
         col = layout.column()
         col.label(text= "Select the player rig", icon= "RESTRICT_SELECT_OFF")
@@ -108,8 +124,8 @@ class TestPanel(bpy.types.Panel):
         row = layout.row()
         row.label(text= "Snap cosmetic to a rig", icon= "COMMUNITY")
         row = layout.row(align=True)
-        row.operator("rig.snap", icon="SHADERFX")
-        row.operator("rig.remove", icon="LOOP_BACK")
+        row.operator("rig.snap", icon="LINKED")
+        row.operator("rig.remove", icon="UNLINKED")
 
 
         
