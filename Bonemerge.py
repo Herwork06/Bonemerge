@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Bonemerge",
     "author": "Herwork, hisanimations",
-    "version": (1, 1),
+    "version": (1, 2, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Rigging",
     "description": "Snaps any cosmetics to a player rig",
